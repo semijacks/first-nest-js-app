@@ -1,4 +1,11 @@
-import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+} from '@nestjs/common';
 
 @Controller('contacts')
 export class ContactsController {
@@ -26,7 +33,7 @@ export class ContactsController {
   ];
 
   @Get()
-  getAll(): object {
+  getAll() {
     return [this.contacts];
   }
 
@@ -39,5 +46,26 @@ export class ContactsController {
     }
 
     return { ...c };
+  }
+
+  @Post()
+  createContacts(@Body() body) {
+    let ids = this.contacts.map((c) => c.id);
+    let newId = 1 + Math.max(...ids);
+    let out = null;
+
+    if (body instanceof Array) {
+      let contacts = body;
+      contacts.forEach((c, i) => (c.id = newId + i));
+      this.contacts.push(...contacts);
+      out = contacts;
+    } else {
+      let contact = body;
+      contact.id = newId;
+      this.contacts.push(contact);
+      out = contact;
+    }
+
+    return out;
   }
 }
